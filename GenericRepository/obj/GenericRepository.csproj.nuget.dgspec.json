@@ -50,9 +50,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
             "MongoDB.Driver": {
               "target": "Package",
               "version": "[3.3.0, )"
+            },
+            "System.Linq.Dynamic.Core": {
+              "target": "Package",
+              "version": "[1.6.2, )"
             }
           },
           "imports": [

@@ -1,7 +1,6 @@
-﻿using MongoDB.Bson;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace GenericRepository
+namespace GenericRepository.MSSQL
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
@@ -42,16 +41,16 @@ namespace GenericRepository
         /// <param name="sortField"> Sort field name. Default is null. Start with "!" for false value and reverse</param>
         /// <param name="pageSize">Size of item list</param>
         /// <param name="skip">Skip number of items</param>
-        /// <param name="aggregation"> Aggregation pipeline for MongoDB</param>
+        /// <param name="includeProperties">String value that present list of return fields, split each field by ","</param>
         /// <returns>Return item list and bool value and string message for result of method</returns>
-        public Task<(IEnumerable<TEntity>, bool, string)> GetPagingAsync(Dictionary<string, string> searchParams, string? sortField = null, int? pageSize = 5, int? skip = 1, BsonDocument[] aggregation = null);
+        public Task<(IEnumerable<TEntity>, bool, string)> GetPagingAsync(Dictionary<string, string> searchParams, string? sortField = null, int? pageSize = 5, int? skip = 1, string? includeProperties = null);
         /// <summary>
         /// Get item list by filter expression
         /// </summary>
         /// <param name="filter"> Filter expression. Default is null</param>
-        /// <param name="aggregation"> Aggregation pipeline for MongoDB</param> 
+        /// <param name="includeProperties">String value that present list of return fields, split each field by ","</param>
         /// <returns>Return item list and bool value and string message for result of method</returns>
-        public Task<(IEnumerable<TEntity>, bool, string)> GetByFilterAsync(Expression<Func<TEntity, bool>>? filter = null, BsonDocument[] aggregation = null);
+        public Task<(IEnumerable<TEntity>, bool, string)> GetByFilterAsync(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null);
         /// <summary>
         /// Count number of items in collection by condition
         /// </summary>
@@ -61,3 +60,4 @@ namespace GenericRepository
         public Task<long> CountAsync(Dictionary<string, string> searchParams, int pageSize = 5);
     }
 }
+

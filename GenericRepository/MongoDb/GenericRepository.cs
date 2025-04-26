@@ -3,12 +3,12 @@ using MongoDB.Driver;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
-namespace GenericRepository
+namespace GenericRepository.NewFolder
 {
-    public class MongoDbGenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
     {
         private readonly IMongoCollection<TEntity> _collection;
-        public MongoDbGenericRepository(IMongoDatabase database, string collectionName)
+        public GenericRepository(IMongoDatabase database, string collectionName)
         {
             _collection = database.GetCollection<TEntity>(collectionName);
         }
@@ -60,7 +60,7 @@ namespace GenericRepository
             }
         }
 
-        public async Task<(IEnumerable<TEntity>?, bool, string)> GetByFilterAsync(Expression<Func<TEntity, bool>>? filter = null, BsonDocument[] aggregation = null)
+        public async Task<(IEnumerable<TEntity>?, bool, string)> GetByFilterAsync(Expression<Func<TEntity, bool>>? filter = null, BsonDocument[]? aggregation = null)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace GenericRepository
             }
         }
 
-        public async Task<(TEntity, bool, string)> GetByIdAsync(Guid Id)
+        public async Task<(TEntity?, bool, string)> GetByIdAsync(Guid Id)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace GenericRepository
             }
         }
 
-        public async Task<(IEnumerable<TEntity>, bool, string)> GetPagingAsync(Dictionary<string, string> searchParams, string? sortField = null, int? pageSize = 5, int? skip = 1, BsonDocument[] aggregation = null)
+        public async Task<(IEnumerable<TEntity>?, bool, string)> GetPagingAsync(Dictionary<string, string> searchParams, string? sortField = null, int? pageSize = 5, int? skip = 1, BsonDocument[]? aggregation = null)
         {
             try
             {
@@ -126,9 +126,10 @@ namespace GenericRepository
                 }
 
                 // Paging
-
-                query = query.Skip(((int)skip - 1) * (int)pageSize)
-                             .Limit((int)pageSize);
+                var intSkip = skip == null ? 1 : (int)skip;
+                var intPageSize = pageSize == null ? 5 : (int)pageSize;
+                query = query.Skip((intSkip - 1) * intPageSize)
+                             .Limit(intPageSize);
 
                 if (aggregation != null)
                 {
