@@ -45,11 +45,11 @@ namespace GenericRepository.NewFolder
             }
         }
 
-        public async Task<long> CountAsync(Dictionary<string, string> searchParams, int pageSize = 5)
+        public async Task<long> CountAsync(string[]? searchParams, string[]? searchValues, int pageSize = 5)
         {
             try
             {
-                FilterDefinition<TEntity> filterDefinition = FilterDefinitionsBuilder(searchParams);
+                FilterDefinition<TEntity> filterDefinition = FilterDefinitionsBuilder(searchParams, searchValues);
                 //Query
                 var count = await _collection.CountDocumentsAsync(filterDefinition);
                 return (long)Math.Ceiling((double)count / pageSize);
@@ -103,13 +103,13 @@ namespace GenericRepository.NewFolder
             }
         }
 
-        public async Task<(IEnumerable<TEntity>?, bool, string)> GetPagingAsync(Dictionary<string, string> searchParams, string? sortField = null, int? pageSize = 5, int? skip = 1, BsonDocument[]? aggregation = null)
+        public async Task<(IEnumerable<TEntity>?, bool, string)> GetPagingAsync(string[]? searchParams, string[]? searchValues, string? sortField = null, int? pageSize = 5, int? skip = 1, BsonDocument[]? aggregation = null)
         {
             try
             {
 
                 //Create Filter
-                FilterDefinition<TEntity> filterDefinition = FilterDefinitionsBuilder(searchParams);
+                FilterDefinition<TEntity> filterDefinition = FilterDefinitionsBuilder(searchParams,searchValues);
 
                 //Query
                 IAggregateFluent<TEntity> query = _collection.Aggregate().Match(filterDefinition);
@@ -216,17 +216,16 @@ namespace GenericRepository.NewFolder
             }
         }
         //------------------------------------------------------------------------------------------------------------------------------
-        private FilterDefinition<TEntity> FilterDefinitionsBuilder(Dictionary<string, string> searchTerms)
+        private FilterDefinition<TEntity> FilterDefinitionsBuilder(string[]? searchParams, string[]? searchValue)
         {
             var isNotDeletedFilter = Builders<TEntity>.Filter.Eq("isDeleted", false);
             var combinedFilter = isNotDeletedFilter;
-
-            foreach (var term in searchTerms)
+            if (searchParams == null || searchValue == null || searchParams.Length != searchValue.Length)
             {
-                string fieldName = term.Key;
-                string searchText = term.Value;
-
-                combinedFilter = Builders<TEntity>.Filter.And(combinedFilter, BuildFilterForField(fieldName, searchText));
+                return combinedFilter;
+            }
+            for (int i = 0; i < searchParams.Length; i++) { 
+                combinedFilter = Builders<TEntity>.Filter.And(combinedFilter, BuildFilterForField(searchParams[i], searchValue[i]));
             }
 
             return combinedFilter;

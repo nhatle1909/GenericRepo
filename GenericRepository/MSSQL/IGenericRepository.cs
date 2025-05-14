@@ -37,13 +37,14 @@ namespace GenericRepository.MSSQL
         /// <summary>
         /// Get item list by filter with paging, sorting
         /// </summary>
-        /// <param name="searchParams"> Dictionary of search params. Key is field name and value is field value. Field value is string and can have many value, split by ","</param>
+        /// <param name="searchParams"> String array for search params, each value present for a field of entity </param>
+        /// <param name="searchValues"> String array for search value, each value can be many value for a parameter ( split by "," )</param>
         /// <param name="sortField"> Sort field name. Default is null. Start with "!" for false value and reverse</param>
         /// <param name="pageSize">Size of item list</param>
         /// <param name="skip">Skip number of items</param>
         /// <param name="includeProperties">String value that present list of return fields, split each field by ","</param>
         /// <returns>Return item list and bool value and string message for result of method</returns>
-        public Task<(IEnumerable<TEntity>, bool, string)> GetPagingAsync(Dictionary<string, string> searchParams, string? sortField = null, int? pageSize = 5, int? skip = 1, string? includeProperties = null);
+        public Task<(IEnumerable<TEntity>, bool, string)> GetPagingAsync(string[]? searchParams, string[]? searchValues, string? sortField = null, int? pageSize = 5, int? skip = 1, string? includeProperties = null);
         /// <summary>
         /// Get item list by filter expression
         /// </summary>
